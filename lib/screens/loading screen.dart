@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:clima/services/location.dart';
+import 'package:clima/services/networking.dart';
+
+const apikey = "d87cc74e42d6ac7743dbefe2a9891139";
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -8,36 +10,39 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  void GetLocation() async {
-    Location location = Location();
-    await location.GetCurrentLocation();
-    print(location.latitude);
-    print(location.longitude);
-  }
-
-  void GetData() async {
-    http.Response response = await http.get(Uri.parse(
-        'https://samples.openweathermap.org/data/2.5/weather?q=London&mode=html&appid=b6907d289e10d714a6e88b30761fae22'));
-    print(response.body);
-  }
+  double latitude;
+  double longitude;
 
   @override
   void initState() {
     super.initState();
-    print("initState Called");
-    GetLocation();
-    GetData();
+    getLocationData();
+  }
+
+  void getLocationData() async {
+    Location location = Location();
+    await location.GetCurrentLocation();
+    setState(() {
+      latitude = location.latitude;
+      longitude = location.longitude;
+    });
   }
 
   @override
   void deactivate() {
-    print("deadctivate called");
+    print("deactivate called");
     super.deactivate();
   }
 
   @override
   Widget build(BuildContext context) {
-    GetData();
-    return Scaffold();
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Latitude: $latitude, Longitude: $longitude',
+          style: TextStyle(fontSize: 24.0),
+        ),
+      ),
+    );
   }
 }
